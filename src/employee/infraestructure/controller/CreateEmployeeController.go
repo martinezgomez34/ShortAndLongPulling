@@ -10,10 +10,11 @@ import (
 
 type CreateEmployeeController struct {
 	employeeUseCase *application.CreateEmployeeUseCase
+	notifyEmployeeCreated *application.NotifyEmployeeCreatedUseCase
 }
 
-func NewEmployee(uc *application.CreateEmployeeUseCase) *CreateEmployeeController {
-	return &CreateEmployeeController{employeeUseCase: uc}
+func NewEmployee(uc *application.CreateEmployeeUseCase, notify *application.NotifyEmployeeCreatedUseCase) *CreateEmployeeController {
+	return &CreateEmployeeController{employeeUseCase: uc, notifyEmployeeCreated: notify}
 }
 
 func (c *CreateEmployeeController) Save(ctx *gin.Context) {
@@ -26,5 +27,8 @@ func (c *CreateEmployeeController) Save(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+	
+	c.notifyEmployeeCreated.NotifyEmployeeCreated(&employee)
+
 	ctx.JSON(http.StatusCreated, gin.H{"message": "Employee created successfully"})
 }

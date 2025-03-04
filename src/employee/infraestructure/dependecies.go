@@ -17,13 +17,19 @@ func RegisterEmployeeRoutes(router *gin.Engine) {
 	listEmployeeUC := application.ListEmployee(repo)
 	editEmployeeUC := application.EditEmployee(repo)
 	deleteEmployeeUC := application.DeleteEmployee(repo)
-	getByEmployeeUC := application.GetByIDEmployee(repo)
 
-	createEmployeeController := controller.NewEmployee(createEmployeeUC)
+	notifyEmployeeCreatedUC := application.NewNotifyEmployeeCreatedUC()  
+	notifyEmployeeActionUC := application.NewNotifyEmployeeActionUC() 
+
+	createEmployeeController := controller.NewEmployee(createEmployeeUC, notifyEmployeeCreatedUC)
 	listEmployeeController := controller.ListEmployee(listEmployeeUC)
-	editEmployeeController := controller.EditEmployee(editEmployeeUC)
-	deleteEmployeeController := controller.DeleteEmployee(deleteEmployeeUC)
-	getByEmployeeController := controller.NewGetByIDProductController(getByEmployeeUC)
+	editEmployeeController := controller.EditEmployee(editEmployeeUC, notifyEmployeeActionUC)
+	deleteEmployeeController := controller.DeleteEmployee(deleteEmployeeUC, notifyEmployeeActionUC)
 
-	rute.EmployeeRoutes(router, createEmployeeController, listEmployeeController, editEmployeeController, deleteEmployeeController, getByEmployeeController)
+
+	notifyEmployeeCreatedController := controller.NewNotifyEmployeeCreatedController(notifyEmployeeCreatedUC)
+	notifyEmployeeActionController := controller.NewNotifyEmployeeActionController(notifyEmployeeActionUC)
+
+	rute.EmployeeRoutes(router, createEmployeeController, listEmployeeController, editEmployeeController, deleteEmployeeController, 
+		notifyEmployeeCreatedController, notifyEmployeeActionController)
 }

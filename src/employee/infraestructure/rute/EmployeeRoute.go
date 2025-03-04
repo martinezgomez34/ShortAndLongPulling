@@ -7,13 +7,18 @@ import (
 
 func EmployeeRoutes(router *gin.Engine, createEmployeeController *controller.CreateEmployeeController,
 	listEmployeeController *controller.ListEmployeeController,  editemployeeController *controller.EditEmployeeController,
-	deleteEmployeeController *controller.DeleteEmployeeController, getByEmployeeController *controller.GetByIDEmployeeController) {
+	deleteEmployeeController *controller.DeleteEmployeeController,
+	notifyEmployeeCreatedController *controller.NotifyEmployeeCreatedController,
+	notifyEmployeeActionController *controller.NotifyEmployeeActionController) {
+
 	employeeGroup := router.Group("/employees")
 	{
 		employeeGroup.POST("/", createEmployeeController.Save)
 		employeeGroup.GET("/", listEmployeeController.GetAll)
-		employeeGroup.GET("/:id", getByEmployeeController.GetEmployeeByID)
 		employeeGroup.PUT("/:id", editemployeeController.Update)
 		employeeGroup.DELETE("/:id", deleteEmployeeController.Delete)
 	}
+
+	router.GET("/notifications/employee-created", notifyEmployeeCreatedController.WaitForNewEmployee)
+	router.GET("/notifications/employee-action", notifyEmployeeActionController.GetEmployeeActions)
 }

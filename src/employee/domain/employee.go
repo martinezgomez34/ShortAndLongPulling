@@ -1,7 +1,7 @@
 package domain
 
 type Employee struct {
-	ID int16
+	ID int32
 	FirstName string
 	LastName string
 	Age int16

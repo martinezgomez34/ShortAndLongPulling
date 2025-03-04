@@ -9,11 +9,15 @@ import (
 )
 
 type DeleteEmployeeController struct {
-	employeeUseCase *application.DeleteEmployeeUseCase
+	employeeUseCase       *application.DeleteEmployeeUseCase
+	notifyEmployeeAction  *application.NotifyEmployeeActionUseCase
 }
 
-func DeleteEmployee(uc *application.DeleteEmployeeUseCase) *DeleteEmployeeController {
-	return &DeleteEmployeeController{employeeUseCase: uc}
+func DeleteEmployee(uc *application.DeleteEmployeeUseCase, notify *application.NotifyEmployeeActionUseCase) *DeleteEmployeeController {
+	return &DeleteEmployeeController{
+		employeeUseCase:      uc,
+		notifyEmployeeAction: notify,
+	}
 }
 
 func (c *DeleteEmployeeController) Delete(ctx *gin.Context) {
@@ -27,5 +31,8 @@ func (c *DeleteEmployeeController) Delete(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+	
+	c.notifyEmployeeAction.RegisterAction(int32(id), "deleted")
+
 	ctx.JSON(http.StatusOK, gin.H{"message": "Employee deleted successfully"})
 }

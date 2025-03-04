@@ -10,24 +10,28 @@ import (
 )
 
 type EditEmployeeController struct {
-	employeeUseCase *application.EditEmployeeUseCase
+	employeeUseCase       *application.EditEmployeeUseCase
+	notifyEmployeeAction  *application.NotifyEmployeeActionUseCase
 }
 
-func EditEmployee(uc *application.EditEmployeeUseCase) *EditEmployeeController {
-	return &EditEmployeeController{employeeUseCase: uc}
+func EditEmployee(uc *application.EditEmployeeUseCase, notify *application.NotifyEmployeeActionUseCase) *EditEmployeeController {
+	return &EditEmployeeController{employeeUseCase: uc, notifyEmployeeAction: notify}
 }
 
 func (pc *EditEmployeeController) Update(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
-	var enployee domain.Employee
-	if err := c.ShouldBindJSON(&enployee); err != nil {
+	var employee domain.Employee
+	if err := c.ShouldBindJSON(&employee); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	enployee.ID = int16(id)
-	if err := pc.employeeUseCase.Update(&enployee); err != nil {
+	employee.ID = int32(id)
+	if err := pc.employeeUseCase.Update(&employee); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "Product updated successfully"})
+
+	pc.notifyEmployeeAction.RegisterAction(employee.ID, "updated")
+
+	c.JSON(http.StatusOK, gin.H{"message": "Employee updated successfully"})
 }
