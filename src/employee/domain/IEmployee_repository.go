@@ -5,5 +5,4 @@ type IEmployee interface{
 	GetAll() ([]*Employee, error) 
 	Update(employee *Employee) error
 	Delete(id int32) error
-	GetByID(id int32) (*Employee, error)
 }
